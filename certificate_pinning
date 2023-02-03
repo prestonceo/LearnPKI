@@ -1,0 +1,26 @@
+```python
+
+import requests
+
+# Load the pinned certificate
+with open("pinned.crt", "rb") as f:
+    pinned_cert = f.read()
+
+# Create a custom adapter that performs certificate pinning
+class PinnedCertAdapter(requests.adapters.HTTPAdapter):
+    def cert_verify(self, conn, url, verify, cert):
+        # Perform certificate pinning
+        if pinned_cert not in cert:
+            return False
+        return super().cert_verify(conn, url, verify, cert)
+
+# Create a session that uses the custom adapter
+session = requests.Session()
+session.mount("https://", PinnedCertAdapter())
+
+# Make a request to the server
+response = session.get("https://example.com")
+
+# Read the response
+print(response.text)
+```
