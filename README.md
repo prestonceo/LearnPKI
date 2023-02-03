@@ -130,7 +130,95 @@ This will write the public key to the file public_key.pem.
 Bulletproof TLS Newsletter provides resourceful information on the latest developments on SSL/TLS Bulletproof TLS Newsletter | Feisty Duck  get started with your PKI journey with one of the solutions below from multiple cloud providers
 
 
-**PKI solutions across cloud providers** 
+
+## Ceritificate pinning examples as a learning reference
+
+python 
+```python
+
+import requests
+
+# Load the pinned certificate
+with open("pinned.crt", "rb") as f:
+    pinned_cert = f.read()
+
+# Create a custom adapter that performs certificate pinning
+class PinnedCertAdapter(requests.adapters.HTTPAdapter):
+    def cert_verify(self, conn, url, verify, cert):
+        # Perform certificate pinning
+        if pinned_cert not in cert:
+            return False
+        return super().cert_verify(conn, url, verify, cert)
+
+# Create a session that uses the custom adapter
+session = requests.Session()
+session.mount("https://", PinnedCertAdapter())
+
+# Make a request to the server
+response = session.get("https://example.com")
+
+# Read the response
+print(response.text)
+```
+**Example in go**
+
+```go
+package main
+
+import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
+
+func main() {
+	// Load the pinned certificate
+	pinnedCert, err := ioutil.ReadFile("pinned.crt")
+	if err != nil {
+		fmt.Println("Error reading pinned certificate:", err)
+		return
+	}
+
+	// Create a new certificate pool and add the pinned certificate
+	certPool := x509.NewCertPool()
+	certPool.AppendCertsFromPEM(pinnedCert)
+
+	// Create a new transport that uses the certificate pool for certificate verification
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: certPool,
+		},
+	}
+
+	// Create a new client that uses the custom transport
+	client := &http.Client{Transport: transport}
+
+	// Make a request to the server
+	resp, err := client.Get("https://example.com")
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the response
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return
+	}
+
+	fmt.Println(string(body))
+}
+```
+
+In both examples, the pinned certificate is loaded from a file and added to a certificate pool or a custom adapter. The certificate pool or custom adapter is then used to verify the certificate presented by the server during the SSL/TLS handshake. If the certificate presented by the server does not match the pinned certificate, the connection will be rejected.
+
+
+
+**PKI solutions available from different cloud providers** 
 
 **Azure** - Azure Key Vault is a cloud-based key management service that enables you to store, manage, and control access to cryptographic keys, certificates, and secrets. You can use Azure Key Vault to create and manage digital certificates, including X.509 certificates, that are used for authentication, secure communication, and secure storage.
 
@@ -141,3 +229,6 @@ Bulletproof TLS Newsletter provides resourceful information on the latest develo
 **AWS Key Management Service** (KMS) is a service that enables you to create and manage encryption keys that are used to encrypt your data. KMS integrates with other AWS services, such as Amazon S3 and Amazon RDS, to provide a secure key management solution for your applications.
 
 **Google Cloud Key Management Service** (KMS) is a service that enables you to create and manage encryption keys that are used to encrypt your data. KMS integrates with other Google Cloud services, such as Google Cloud Storage and Google Cloud SQL, to provide a secure key management solution for your applications.
+
+
+
