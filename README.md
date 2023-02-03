@@ -2,7 +2,7 @@
 Summarized learning experience of X.509 and Public Key Infrastructure (PKI) 
 This is not intended for any production standards, but to help with learning the architecture of how PKI is applied in the process. 
 
-Zero-trust architecture has become the accelerated standard for protecting infrastructure and everything around it. PKI is the centralized component playing a significant role in trust for how reuquest are made and how that information is encrypted > decrypted > encrypted, to provide secure connections and detections of common attacks like malware trying to infiltrate applications. 
+Zero-trust architecture has become the accelerated standard for protecting infrastructure and everything around it. PKI is the centralized component playing a significant role in trust for how request are made and how that information is encrypted > decrypted > encrypted, to provide secure connections and detections of common attacks like malware trying to infiltrate applications. 
 
 
 ## What is PKI ?  
